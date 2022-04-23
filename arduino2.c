@@ -4,16 +4,16 @@ int button = 2;
 
 void setup() {
   // Begin the Serial at 9600 Baud
-  Serial.begin(100);
+  Serial.begin(9600);
   pinMode(bulb, OUTPUT);
   pinMode(button, INPUT);
 }
 
 void loop() {
-  Serial.readBytes(unlocked,8); //Read the serial data and store in var
+  Serial.readBytes(unlocked, 8); //Read the serial data and store in var
   Serial.println(unlocked); //Print data on Serial Monitor
   
-  if (unlocked) {
+  if (strcmp(unlocked, "Unlocked")) {
     digitalWrite(bulb, HIGH);
   }
   delay(1000);
