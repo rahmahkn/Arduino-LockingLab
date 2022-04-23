@@ -25,18 +25,18 @@ char keyMap [rows] [cols] = { //define the cymbols on the buttons of the keypad
 };
 
 byte rowPins [rows] = {7, 6, 5, 4}; //pins of the keypad
-byte colPins [cols] = {3, 2, 1, 0};
+byte colPins [cols] = {3, 2, A2, A3};
 
 Keypad myKeypad = Keypad( makeKeymap(keyMap), rowPins, colPins, rows, cols );
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 
 Servo servo;
-// char unlocked[10] = "Unlocked";
+char unlocked[10] = "Unlocked";
 
 void setup()
 {
-    // Serial.begin(9600);
+    Serial.begin(9600);
     lcd.begin(16, 2); 
     servo.attach(A0, 500, 2500);
 }
@@ -107,7 +107,7 @@ void loop()
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Invalid Input!");
-        delay(1000);
+        delay(100);
         lcd.clear();
     }
   
@@ -132,11 +132,11 @@ void loop()
             lcd.clear();
             lcd.setCursor(0, 0);
             lcd.print("UNLOCKED");
-            // Serial.write(unlocked, 8);
+            Serial.write(unlocked, 8);
 
             servo.attach(A0, 500, 2500);
             servo.write(179);
-            delay(1000);
+            delay(100);
             lcd.clear();
         } else if (digits == 4 && pozisyon < 4) {
             delayRunning = false;
@@ -150,7 +150,7 @@ void loop()
             lcd.print("INCORRECT PASSWORD");
             servo.attach(A0, 500, 2500);
             servo.write(1);
-            delay(1000);
+            delay(100);
             lcd.clear();
         }
     }
