@@ -36,7 +36,7 @@ char unlocked[10] = "Unlocked";
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(100);
     lcd.begin(16, 2); 
     servo.attach(A0, 500, 2500);
 }
