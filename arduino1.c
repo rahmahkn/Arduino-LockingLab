@@ -1,5 +1,6 @@
 #include <LiquidCrystal.h> //include LCD library (standard library)
 #include <Keypad.h> //include keypad library - first you must install library (library link in the video description)
+#include <Servo.h>
 
 unsigned long DELAY_TIME = 10; // 15 sec
 unsigned long DELAY_INPUT = 10;
@@ -30,10 +31,12 @@ Keypad myKeypad = Keypad( makeKeymap(keyMap), rowPins, colPins, rows, cols );
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 
+Servo servo;
+
 void setup()
 {
     lcd.begin(16, 2); 
-    // setLocked (true); //state of the password
+    servo.attach(A0, 500, 2500);
 }
 
 void loop()
@@ -43,6 +46,7 @@ void loop()
         lcd.print("Welcome");
         lcd.setCursor(0, 1);
         lcd.print("to Lab!");
+        servo.write(1);
     }
 
     if (delayInput) {
@@ -64,10 +68,6 @@ void loop()
     if (tempWhichKey) {
         whichKey = tempWhichKey;
     }
-
-    // if (!(whichKey == '*' || whichKey == '#' || whichKey == 'A' || whichKey == 'B' || whichKey == 'C' || whichKey == 'D')) {
-    //     digits ++;
-    // }
   
     if (whichKey == 'A' && !delayRunning && !delayInput) {
         lcd.clear();
@@ -102,7 +102,6 @@ void loop()
   	if (cond1 && !delayInput) {
         pozisyon = 0;
         digits = 0;
-        // setLocked (true);
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Invalid Input!");
@@ -128,10 +127,12 @@ void loop()
             delayRunning = false;
             pozisyon = 0;
             digits = 0;
-            // setLocked (false);
             lcd.clear();
             lcd.setCursor(0, 0);
             lcd.print("UNLOCKED");
+
+            servo.attach(A0, 500, 2500);
+            servo.write(179);
             delay(1000);
             lcd.clear();
         } else if (digits == 4 && pozisyon < 4) {
@@ -142,7 +143,10 @@ void loop()
             digits = 0;
             lcd.clear();
             lcd.setCursor(0, 0);
+
             lcd.print("INCORRECT PASSWORD");
+            servo.attach(A0, 500, 2500);
+            servo.write(1);
             delay(1000);
             lcd.clear();
         }
@@ -150,18 +154,3 @@ void loop()
 
     delay(100); 
 }
-
-// void setLocked(int locked){
-//     if (locked) {
-//         lcd.setCursor(0, 0);
-//         lcd.print("Locked");
-//         lcd.setCursor(0, 1);
-//         lcd.print("");
-//     }
-//     else {
-//         lcd.setCursor(0, 0);
-//         lcd.print("Unlocked");
-//         lcd.setCursor(0, 1);
-//         lcd.print("");
-//     }
-// }
