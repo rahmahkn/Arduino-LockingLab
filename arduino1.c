@@ -54,18 +54,6 @@ void loop()
 
     int secs = (millis() - delayStart) / 1000;
 
-    // if (secs >= DELAY_TIME) {
-    //     lcd.clear();
-    //     lcd.setCursor(0, 0);
-    //     lcd.print("Please Try Again");
-    //     lcd.clear();
-    //     delay(1000);
-    //     lcd.setCursor(0, 0);
-    //     lcd.print("Welcome");
-    //     lcd.setCursor(0, 1);
-    //     lcd.print("to Lab!");
-    // }
-
     if (delayRunning) {
         if (secs <= DELAY_TIME) {
             lcd.setCursor(0, 1);
@@ -75,25 +63,6 @@ void loop()
             delayRunning = false;
         }
     }
-  
-    // if (delayRunning) {
-    //     lcd.setCursor(0, 1);
-    //     lcd.print((millis() - delayStart) / 1000);
-    
-    //     if (millis()-delayStart >= DELAY_TIME) {
-    //         lcd.clear();
-    //         lcd.setCursor(0, 0);
-    //         lcd.print("Please Try Again");
-    //         delay(1000);
-    //         lcd.clear();
-    //         lcd.setCursor(0, 0);
-    //         lcd.print("    Welcome");
-    //         lcd.setCursor(0, 1);
-    //         lcd.print(" to Lab!");
-            
-    //         delayRunning = false;
-    //     }    
-    // }
 
   	if (whichKey == '*' || whichKey == '#' || whichKey == 'B' || whichKey == 'C' || whichKey == 'D') {
         pozisyon=0;
