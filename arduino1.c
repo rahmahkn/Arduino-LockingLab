@@ -32,9 +32,11 @@ Keypad myKeypad = Keypad( makeKeymap(keyMap), rowPins, colPins, rows, cols );
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 
 Servo servo;
+// char unlocked[10] = "Unlocked";
 
 void setup()
 {
+    // Serial.begin(9600);
     lcd.begin(16, 2); 
     servo.attach(A0, 500, 2500);
 }
@@ -130,6 +132,7 @@ void loop()
             lcd.clear();
             lcd.setCursor(0, 0);
             lcd.print("UNLOCKED");
+            // Serial.write(unlocked, 8);
 
             servo.attach(A0, 500, 2500);
             servo.write(179);
