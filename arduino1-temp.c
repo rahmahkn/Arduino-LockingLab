@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h> //include LCD library (standard library)
 #include <Keypad.h> //include keypad library - first you must install library (library link in the video description)
 
-unsigned long DELAY_TIME = 15; // 15 sec
+unsigned long DELAY_TIME = 10; // 15 sec
 unsigned long delayStart = 0; // the time the delay started
 bool delayRunning = false; // true if still waiting for delay to finish
 
@@ -29,6 +29,7 @@ LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 void setup()
 {
     lcd.begin(16, 2); 
+    // setLocked (true); //state of the password
 }
 
 void loop()
@@ -43,53 +44,78 @@ void loop()
     char whichKey = myKeypad.getKey(); //define which key is pressed with getKey
 	Serial.println(whichKey);
   
-    // if (whichKey == 'A' && !delayRunning) {
-    //     lcd.clear();
-    //     lcd.setCursor(0, 0);
-    //     lcd.print("Password: ");
+    if (whichKey == 'A' && !delayRunning) {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Enter Password");
         
-    //     delayStart = millis();
-    //     delayRunning = true;
-    // }
+        delayStart = millis();
+        delayRunning = true;
+    }
 
-    if (whichKey == '*' || whichKey == '#' || whichKey == 'B' || whichKey == 'C' || whichKey == 'D') {
+    int secs = (millis() - delayStart) / 1000;
+
+    if (delayRunning) {
+        if (secs <= DELAY_TIME) {
+            lcd.setCursor(0, 1);
+            lcd.print(secs);
+        } else {
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("TIME IS UP");
+            delay(3000);
+            delayRunning = false;
+        }
+    }
+
+  	if (whichKey == '*' || whichKey == '#' || whichKey == 'B' || whichKey == 'C' || whichKey == 'D') {
         pozisyon=0;
+        // setLocked (true);
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("  Invalid Key!");
         delay(1000);
         lcd.clear();
     }
-
-    // int secs = (millis() - delayStart) / 1000;
-
-    // if (delayRunning) {
-    //     if (secs <= DELAY_TIME) {
-    //         lcd.setCursor(0, 1);
-    //         lcd.print(secs);
-    //     } else {
-    //         lcd.clear();
-    //         delayRunning = false;
-    //     }
-    // }
-  
-    // else if (whichKey != '\0') {
-    //     lcd.setCursor(10+digits, 0);
-    //     lcd.print("*");
-    //     digits++;
-    // }
-  
+    
     if (whichKey == password [pozisyon]) {
         pozisyon ++;
+        digits ++;
+    } else {
+        digits ++;
     }
     
-    if (pozisyon == 4) {
+    if (pozisyon == 4 && digits == 4) {
         delayRunning = false;
+        // setLocked (false);
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("UNLOCKED");
         delay(3000);
         lcd.clear();
     }
-    delay(1000); 
+    // else if (pozisyon < 4 && digits == 4) {
+    //     lcd.clear();
+    //     lcd.setCursor(0, 0);
+    //     lcd.print("INCORRECT PASSWORD");
+    //     delay(3000);
+    //     lcd.clear();
+    // }
+    
+    delay(100); 
 }
+
+// void setLocked(int locked){
+//     if (locked) {
+//         lcd.setCursor(0, 0);
+//         lcd.print("Locked");
+//         lcd.setCursor(0, 1);
+//         lcd.print("");
+//     }
+//     else {
+//         lcd.setCursor(0, 0);
+//         lcd.print("Unlocked");
+//         lcd.setCursor(0, 1);
+//         lcd.print("");
+//     }
+// }
