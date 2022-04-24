@@ -1,5 +1,3 @@
-#include <Servo.h>
-
 char opened[10] = "Opened";
 char unlocked[10]; //Initialized variable to store recieved data
 int bulb = 3;
@@ -15,14 +13,11 @@ bool bulb_high = false;
 bool entering = false;
 bool exiting = false;
 
-Servo servo;
-
 void setup() {
   Serial.begin(9600);
   pinMode(bulb, OUTPUT);
   pinMode(button, INPUT);
   pinMode(sensor, INPUT);
-  servo.attach(A0, 500, 2500);
 }
 
 void loop() {
@@ -39,8 +34,6 @@ void loop() {
     Serial.println("DOOR OPENED");
     Serial.write(opened, 6);
     door_open = true;
-    servo.attach(A0, 500, 2500);
-    servo.write(179);
     
     exiting = true;
     entering = false;
@@ -67,21 +60,15 @@ void loop() {
         }
       }
       
-      door_open = false;
-      servo.attach(A0, 500, 2500);
-      servo.write(1);
-      
+      door_open = false;      
       entering = false;
       exiting = false;
     } else {
       int durationOpen = (millis() - startOpen) / 1000;
 
       if (durationOpen > OPEN_TIME) {
-      door_open = false;
-      servo.attach(A0, 500, 2500);
-      servo.write(1);
-        
-      entering = false;
+        door_open = false;        
+        entering = false;
         exiting = false;
       }
     }
