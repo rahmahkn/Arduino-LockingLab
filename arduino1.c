@@ -42,43 +42,44 @@ void setup()
     Serial.begin(1000);
     lcd.begin(16, 2); 
     servo.attach(A0, 500, 2500);
+    servo.write(0);
 }
 
 void loop()
 {
-  if (Serial.available()) {
-    Serial.readBytes(opened, 8); //Read the serial data and store in var
-    startOpen = millis();
-    // Serial.println("DOOR OPENED");
-    // servo.write(90);
-    Serial.flush();
-  }
+    if (Serial.available()) {
+        Serial.readBytes(opened, 8); //Read the serial data and store in var
+        startOpen = millis();
+        door_open = true;
+        Serial.println("DOOR OPENED");
+        servo.write(0);
+        Serial.flush();
+    }
 
-  int durationOpen = (millis() - startOpen) / 1000;
-  if (durationOpen > DELAY_INPUT) {
-      servo.write(1);
-  }
+    int durationOpen = (millis() - startOpen) / 1000;
+    if (door_open && (durationOpen > DELAY_INPUT)) {
+        servo.write(0);
+        door_open = false;
+    }
 
     if (!delayRunning && !delayInput) {
         lcd.setCursor(0, 0);
-        lcd.print("Welcome");
+        lcd.print("    Welcome");
         lcd.setCursor(0, 1);
-        lcd.print("to Lab!");
+        lcd.print("     to Lab!");
     }
   
-  if (door_open) {
-    servo.write(90);
-  } else {
-    servo.write(1);
-  }
-
     if (delayInput) {
         lcd.setCursor(0, 0);
-        lcd.print("Try again in");
+        lcd.print("  Try again in");
         int secsDelay = (millis() - delayInputStart) / 1000;
 
         if (secsDelay <= DELAY_INPUT) {
             lcd.setCursor(0, 1);
+            lcd.print("      ");
+            lcd.setCursor(6, 1);
+            lcd.print("  ");
+            lcd.setCursor(6, 1);
             lcd.print(DELAY_INPUT - secsDelay);
         } else {
             lcd.clear();
@@ -106,13 +107,15 @@ void loop()
     if (delayRunning && !delayInput) {
         if (secs <= DELAY_TIME) {
             lcd.setCursor(0, 1);
+            lcd.print("Input in");
+            lcd.setCursor(9, 1);
             lcd.print("   ");
-            lcd.setCursor(0, 1);
+            lcd.setCursor(9, 1);
             lcd.print(DELAY_TIME - secs);
         } else {
             lcd.clear();
             lcd.setCursor(0, 0);
-            lcd.print("Time is Up!");
+            lcd.print("   Time is Up!");
             lcd.clear();
             delayRunning = false;
             pozisyon = 0;
@@ -144,9 +147,10 @@ void loop()
             lcd.setCursor(0, 0);
             lcd.print("UNLOCKED");
             Serial.write(unlocked, 8);
+            startOpen = millis();
 
           	door_open = true;
-            servo.write(179);
+            servo.write(90);
             delay(100);
             lcd.clear();
         } else if (digits == 4 && pozisyon < 4) {
@@ -157,9 +161,10 @@ void loop()
             digits = 0;
             lcd.clear();
             lcd.setCursor(0, 0);
-
-            lcd.print("INCORRECT PASSWORD");
-            delay(100);
+            lcd.print("    INCORRECT");
+            lcd.setCursor(0, 1);
+            lcd.print("    PASSWORD");
+            delay(1000);
             lcd.clear();
         }
     }

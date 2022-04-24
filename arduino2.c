@@ -54,8 +54,6 @@ void loop() {
       if (entering) {
        if (num_person == 0) {
           digitalWrite(bulb, HIGH);
-          delay(500);
-          digitalWrite(bulb, LOW);
         }
         num_person ++;
       }
@@ -63,8 +61,6 @@ void loop() {
       if (exiting) {
         num_person --;
         if (num_person == 0) {
-          digitalWrite(bulb, HIGH);
-          delay(500);
           digitalWrite(bulb, LOW);
         }
       }
