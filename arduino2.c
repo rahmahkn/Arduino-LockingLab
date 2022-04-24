@@ -1,5 +1,7 @@
+#include <Servo.h>
+
+char opened[10] = "Opened";
 char unlocked[10]; //Initialized variable to store recieved data
-char unlockedTemp[10];
 int bulb = 3;
 int button = 2;
 int sensor = 4;
@@ -11,14 +13,14 @@ bool bulb_high = false;
 bool entering = false;
 bool exiting = false;
 int failed = 0;
-//bool sent = false;
+Servo servo;
 
 void setup() {
-  // Begin the Serial at 9600 Baud
   Serial.begin(9600);
   pinMode(bulb, OUTPUT);
   pinMode(button, INPUT);
   pinMode(sensor, INPUT);
+  servo.attach(A0, 500, 2500);
 }
 
 void loop() {
@@ -28,24 +30,21 @@ void loop() {
     Serial.println("DOOR OPENED");
     door_open = true;
     entering = true;
-    //sent = true;
     Serial.flush();
   }
   
-//  if (door_open && bulb_high) {
-  //  digitalWrite(bulb, HIGH);
-   // delay(1000);
-    //digitalWrite(bulb, LOW);
-    //bulb_high = false;
- // }
-  
-  if (digitalRead(button) == HIGH){
+  if (digitalRead(button) == HIGH) {
     Serial.println("DOOR OPENED");
+    Serial.write(opened, 8);
     door_open = true;
+    servo.attach(A0, 500, 2500);
+    servo.write(179);
+    
     exiting = true;
     entering = false;
   }
   
+  Serial.println("Num person");
   Serial.println(num_person);
     
   if (door_open) {
@@ -71,6 +70,9 @@ void loop() {
       }
       
       door_open = false;
+      servo.attach(A0, 500, 2500);
+      servo.write(1);
+      
       entering = false;
       exiting = false;
     } else {
@@ -78,6 +80,9 @@ void loop() {
 
       if (durationOpen > OPEN_TIME) {
       door_open = false;
+      servo.attach(A0, 500, 2500);
+      servo.write(1);
+        
       entering = false;
         exiting = false;
         failed ++;

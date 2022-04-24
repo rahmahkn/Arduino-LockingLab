@@ -2,16 +2,18 @@
 #include <Keypad.h> //include keypad library - first you must install library (library link in the video description)
 #include <Servo.h>
 
-unsigned long DELAY_TIME = 10; // 15 sec
+unsigned long DELAY_TIME = 15; // 15 sec
 unsigned long DELAY_INPUT = 10;
 unsigned long delayRunningStart = 0; // the time the delay started
 unsigned long delayInputStart = 0;
 bool delayRunning = false; // true if still waiting for delay to finish
 bool delayInput = false;
+bool door_open = false;
 
 char* password ="1234"; //create a password
 int pozisyon = 0; //keypad position
 int digits = 0;
+int startOpen = 0;
 
 const byte rows = 4; //number of the keypad's rows and columns
 const byte cols = 4;
@@ -25,7 +27,7 @@ char keyMap [rows] [cols] = { //define the cymbols on the buttons of the keypad
 };
 
 byte rowPins [rows] = {7, 6, 5, 4}; //pins of the keypad
-byte colPins [cols] = {3, 2, A2, A3};
+byte colPins [cols] = {3, 2, A4, A5};
 
 Keypad myKeypad = Keypad( makeKeymap(keyMap), rowPins, colPins, rows, cols );
 
@@ -33,6 +35,7 @@ LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 
 Servo servo;
 char unlocked[10] = "Unlocked";
+char opened[10];
 
 void setup()
 {
@@ -43,13 +46,31 @@ void setup()
 
 void loop()
 {
+  if (Serial.available()) {
+    Serial.readBytes(opened, 8); //Read the serial data and store in var
+    startOpen = millis();
+    // Serial.println("DOOR OPENED");
+    // servo.write(90);
+    Serial.flush();
+  }
+
+  int durationOpen = (millis() - startOpen) / 1000;
+  if (durationOpen > DELAY_INPUT) {
+      servo.write(1);
+  }
+
     if (!delayRunning && !delayInput) {
         lcd.setCursor(0, 0);
         lcd.print("Welcome");
         lcd.setCursor(0, 1);
         lcd.print("to Lab!");
-        servo.write(1);
     }
+  
+  if (door_open) {
+    servo.write(90);
+  } else {
+    servo.write(1);
+  }
 
     if (delayInput) {
         lcd.setCursor(0, 0);
@@ -100,16 +121,6 @@ void loop()
 
     bool cond1 = (whichKey == '*' || whichKey == '#' || whichKey == 'B' || whichKey == 'C' || whichKey == 'D');
     bool cond2 = strchr(nums, whichKey);
-
-  	if (cond1 && !delayInput) {
-        pozisyon = 0;
-        digits = 0;
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Invalid Input!");
-        delay(100);
-        lcd.clear();
-    }
   
     if (!delayInput && delayRunning) {
         if (whichKey == password [pozisyon]) {
@@ -134,7 +145,7 @@ void loop()
             lcd.print("UNLOCKED");
             Serial.write(unlocked, 8);
 
-            servo.attach(A0, 500, 2500);
+          	door_open = true;
             servo.write(179);
             delay(100);
             lcd.clear();
@@ -148,8 +159,6 @@ void loop()
             lcd.setCursor(0, 0);
 
             lcd.print("INCORRECT PASSWORD");
-            servo.attach(A0, 500, 2500);
-            servo.write(1);
             delay(100);
             lcd.clear();
         }
