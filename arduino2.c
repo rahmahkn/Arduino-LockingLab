@@ -8,6 +8,9 @@ int OPEN_TIME = 10;
 int num_person = 0;
 bool door_open = false;
 bool bulb_high = false;
+bool entering = false;
+bool exiting = false;
+bool sent = false;
 
 void setup() {
   // Begin the Serial at 9600 Baud
@@ -18,19 +21,20 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available() && (num_person == 0)) {
+  if (Serial.available() && !sent) {
     Serial.readBytes(unlocked, 8); //Read the serial data and store in var
     startOpen = millis();
     door_open = true;
-    bulb_high = true;
+    entering = true;
+    sent = true;
   }
   
-  if (door_open && bulb_high) {
-    digitalWrite(bulb, HIGH);
-    delay(1000);
-    digitalWrite(bulb, LOW);
-    bulb_high = false;
-  }
+//  if (door_open && bulb_high) {
+  //  digitalWrite(bulb, HIGH);
+   // delay(1000);
+    //digitalWrite(bulb, LOW);
+    //bulb_high = false;
+ // }
   
   Serial.println(num_person);
     
@@ -39,26 +43,43 @@ void loop() {
     Serial.println(valSensor);
 
     if (valSensor == HIGH) {
-      num_person ++;
+      if (entering) {
+       if (num_person == 0) {
+    digitalWrite(bulb, HIGH);
+    delay(500);
+    digitalWrite(bulb, LOW);
+        }
+        num_person ++;
+      }
+      
+      if (exiting) {
+        num_person --;
+        if (num_person == 0) {
+    digitalWrite(bulb, HIGH);
+    delay(500);
+    digitalWrite(bulb, LOW);
+        }
+      }
+      
       door_open = false;
+      entering = false;
+      exiting = false;
     } else {
       int durationOpen = (millis() - startOpen) / 1000;
 
       if (durationOpen > OPEN_TIME) {
       door_open = false;
+      entering = false;
+        exiting = false;
       }
     }
   }
   
-  // int valSensor = digitalRead(sensor);
-  // if (valSensor == HIGH) {
-  //   digitalWrite(bulb, HIGH);
-  //   delay(1000);
-  //   digitalWrite(bulb, LOW);
-  //   delay(1000);
-  // } else {
-  //   digitalWrite(bulb, LOW);
-  // }
+  if (digitalRead(button) == HIGH){
+    door_open = true;
+    exiting = true;
+    entering = false;
+  }
   
   delay(100);
 }
