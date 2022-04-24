@@ -11,22 +11,24 @@ bool delayInput = false;
 bool door_open = false;
 
 char* password ="1234"; //create a password
-int pozisyon = 0; //keypad position
+int position = 0; //keypad position
 int digits = 0;
 int startOpen = 0;
 
-const byte rows = 4; //number of the keypad's rows and columns
+//number of the keypad's rows and columns
+const byte rows = 4;
 const byte cols = 4;
 char nums [] = "1234567890";
 
-char keyMap [rows] [cols] = { //define the cymbols on the buttons of the keypad
+char keyMap [rows] [cols] = {
     {'1', '2', '3', 'A'},
     {'4', '5', '6', 'B'},
     {'7', '8', '9', 'C'},
     {'*', '0', '#', 'D'}
 };
 
-byte rowPins [rows] = {7, 6, 5, 4}; //pins of the keypad
+//pins of the keypad
+byte rowPins [rows] = {7, 6, 5, 4};
 byte colPins [cols] = {3, 2, A4, A5};
 
 Keypad myKeypad = Keypad( makeKeymap(keyMap), rowPins, colPins, rows, cols );
@@ -48,12 +50,11 @@ void setup()
 void loop()
 {
     if (Serial.available()) {
-        Serial.readBytes(opened, 8); //Read the serial data and store in var
+        Serial.readBytes(opened, 6); //Read the serial data and store in var
         startOpen = millis();
         door_open = true;
         Serial.println("DOOR OPENED");
-        servo.write(0);
-        Serial.flush();
+        servo.write(90);
     }
 
     int durationOpen = (millis() - startOpen) / 1000;
@@ -87,7 +88,8 @@ void loop()
         }
     }
 
-    char tempWhichKey = myKeypad.getKey(); //define which key is pressed with getKey
+    //define which key is pressed with getKey
+    char tempWhichKey = myKeypad.getKey();
     char whichKey = ' ';
     if (tempWhichKey) {
         whichKey = tempWhichKey;
@@ -118,7 +120,7 @@ void loop()
             lcd.print("   Time is Up!");
             lcd.clear();
             delayRunning = false;
-            pozisyon = 0;
+            position = 0;
         }
     }
 
@@ -126,11 +128,11 @@ void loop()
     bool cond2 = strchr(nums, whichKey);
   
     if (!delayInput && delayRunning) {
-        if (whichKey == password [pozisyon]) {
+        if (whichKey == password [position]) {
             lcd.setCursor(10+digits, 0);
             lcd.print("*");
             delay(100);
-            pozisyon ++;
+            position ++;
             digits ++;
         } else if (cond2) {
             lcd.setCursor(10+digits, 0);
@@ -139,9 +141,9 @@ void loop()
             digits ++;
         }
         
-        if (digits == 4 && pozisyon == 4) {
+        if (digits == 4 && position == 4) {
             delayRunning = false;
-            pozisyon = 0;
+            position = 0;
             digits = 0;
             lcd.clear();
             lcd.setCursor(0, 0);
@@ -153,11 +155,11 @@ void loop()
             servo.write(90);
             delay(100);
             lcd.clear();
-        } else if (digits == 4 && pozisyon < 4) {
+        } else if (digits == 4 && position < 4) {
             delayRunning = false;
             delayInput = true;
             delayInputStart = millis();
-            pozisyon = 0;
+            position = 0;
             digits = 0;
             lcd.clear();
             lcd.setCursor(0, 0);
@@ -169,5 +171,6 @@ void loop()
         }
     }
 
-    delay(100); 
+    delay(100);
+    Serial.flush();
 }

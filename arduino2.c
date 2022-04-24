@@ -5,14 +5,16 @@ char unlocked[10]; //Initialized variable to store recieved data
 int bulb = 3;
 int button = 2;
 int sensor = 4;
+
 int startOpen = 0;
 int OPEN_TIME = 10;
 int num_person = 0;
+
 bool door_open = false;
 bool bulb_high = false;
 bool entering = false;
 bool exiting = false;
-int failed = 0;
+
 Servo servo;
 
 void setup() {
@@ -35,7 +37,7 @@ void loop() {
   
   if (digitalRead(button) == HIGH) {
     Serial.println("DOOR OPENED");
-    Serial.write(opened, 8);
+    Serial.write(opened, 6);
     door_open = true;
     servo.attach(A0, 500, 2500);
     servo.write(179);
@@ -81,7 +83,6 @@ void loop() {
         
       entering = false;
         exiting = false;
-        failed ++;
       }
     }
   }
