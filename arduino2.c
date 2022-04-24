@@ -10,7 +10,8 @@ bool door_open = false;
 bool bulb_high = false;
 bool entering = false;
 bool exiting = false;
-bool sent = false;
+int failed = 0;
+//bool sent = false;
 
 void setup() {
   // Begin the Serial at 9600 Baud
@@ -21,12 +22,14 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available() && !sent) {
+  if (Serial.available()) {
     Serial.readBytes(unlocked, 8); //Read the serial data and store in var
     startOpen = millis();
+    Serial.println("DOOR OPENED");
     door_open = true;
     entering = true;
-    sent = true;
+    //sent = true;
+    Serial.flush();
   }
   
 //  if (door_open && bulb_high) {
@@ -36,18 +39,24 @@ void loop() {
     //bulb_high = false;
  // }
   
+  if (digitalRead(button) == HIGH){
+    Serial.println("DOOR OPENED");
+    door_open = true;
+    exiting = true;
+    entering = false;
+  }
+  
   Serial.println(num_person);
     
   if (door_open) {
     int valSensor = digitalRead(sensor);
-    Serial.println(valSensor);
 
     if (valSensor == HIGH) {
       if (entering) {
        if (num_person == 0) {
-    digitalWrite(bulb, HIGH);
-    delay(500);
-    digitalWrite(bulb, LOW);
+          digitalWrite(bulb, HIGH);
+          delay(500);
+          digitalWrite(bulb, LOW);
         }
         num_person ++;
       }
@@ -55,9 +64,9 @@ void loop() {
       if (exiting) {
         num_person --;
         if (num_person == 0) {
-    digitalWrite(bulb, HIGH);
-    delay(500);
-    digitalWrite(bulb, LOW);
+          digitalWrite(bulb, HIGH);
+          delay(500);
+          digitalWrite(bulb, LOW);
         }
       }
       
@@ -71,14 +80,9 @@ void loop() {
       door_open = false;
       entering = false;
         exiting = false;
+        failed ++;
       }
     }
-  }
-  
-  if (digitalRead(button) == HIGH){
-    door_open = true;
-    exiting = true;
-    entering = false;
   }
   
   delay(100);
